@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+<style>
+  html {
+    width: 100%;
+    height: 100vh;
+  }
+  body{
+    background-image: url(./sozai/grass\ field1.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+  .game-field{
+    width: 100%;
+    height: 700px;
+    display: flex;
+    justify-content: center;
+
+  }
+  #game{
+    cursor: url(./sozai/cursor_black.png) 50 50,auto;
+    width: 85%;
+    height:600px;
+    /* border: 2px solid white; */
+    overflow: hidden;
+    position: relative;
+  }
+  
+
+  #game img{
+    height: 150px;
+    position: absolute;
+  }
+
+  .score-board{
+    width: 8%;
+    height: 200px;
+    position: absolute;
+    /* background: #ff0000; */
+    top: 0;
+    left: 0;
+  }
+
+  .claysu{
+    font-size: 50px;
+    color:white;
+display: flex;
+justify-content: flex-start;
+align-items: center;
+text-shadow: 5px 5px 10px rgb(0, 0, 0);
+  }
+
+  .jikan{
+    font-size: 30px;
+    color: white;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    text-shadow: 5px 5px 10px rgb(0, 0, 0);
+  }
+  .start-box{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #btn-start{
+    width: 10%;
+    height: 50px;
+    background:linear-gradient(to right,rgb(255, 34, 34)10%,rgb(255, 41, 41)75%,rgb(252, 197, 79)75%,rgb(209, 132, 30)100%);
+    color: rgb(255, 255, 255);
+    font-size: 30px;
+    border-radius: 5px;
+    box-shadow: 5px 5px 10px 0 rgb(71, 12, 12);
+    text-shadow: 5px 5px 5px rgb(0, 0, 0);
+  }
+  .clay{
+    z-index: 1000;
+  }
+</style>
+</head>
+<body>
+  <div class="game-field">
+    <div id="pigeonsSky"></div>
+    <div id="game"></div>
+</div>
+<div class="score-board">
+<p class="claysu"><img src="./sozai/clay.png" style="width: 80px; height: 50px;"> <span id="score">0</span></p>
+<p class="jikan">剩餘時間： <br><span id="time">0</span>秒</p>
+</div>
+  <hr>
+  <div class="start-box">
+    <input type="button" value="開始射擊" id="btn-start">
+  </div>
+  <audio id="oh-shit" src="./sound-effect/oh-shit.mp3"></audio>
+  <audio id="clay-break" src="./sound-effect/clay-break.mp3"></audio>
+  <audio id="quack" src="./sound-effect/quack.mp3"></audio>
+  <audio id="pistolSound" src="./sound-effect/pistolSound.mp3"></audio>
+  <audio id="FFvictory" src="./sound-effect/FFvictory.mp3"></audio>
+  
+  <script src="./jquery-3.6.0.min.js"></script>
+<script src="./sweetalert2.all.min.js"></script>
+  <script>
+
+    let score = 0
+    let countdown = 60
+    let timer = 0
+    let realKill = 0
+    const oh = document.getElementById('oh-shit');
+    oh.volume = 0.5;
+    const clayBreak = document.getElementById('clay-break');
+    clayBreak.volume = 0.5;
+
+    const move = (clay) =>{
+      const top = `${Math.round(Math.random()*20)}%`
+          const left = `${Math.round(Math.random()*80)}%`
+          clay.stop().animate({
+            top:top,
+          left:left,
+          },1000,function(){
+            $(this).fadeOut(1000,)
+          })
+    }
+    const move1 = (pigeon) =>{
+      const top = `${Math.round(Math.random()*20)}%`
+          const left = `${Math.round(Math.random()*80)}%`
+          pigeon.stop().animate({
+          top:top,
+          left:left,
+          },1000,function(){
+            $(this).fadeOut(1000,)
+          })
+    }
+
+    $('#btn-start').click(function(){
+      Swal.fire({
+        icon:'info',
+        title:'準備',
+        text:'計時一分鐘，開始射擊。'
+      })
+
+      $(this).attr('disabled',true)
+      score = 0
+      $('#score').text(score)
+
+      countdown = 60
+      $('#time').text(countdown)
+
+      realKill = 0
+
+      timer = setInterval(function(){
+        countdown--
+        $('#time').text(countdown)
+
+        let random = Math.round(Math.random()*30)
+
+        if(random > 1&&random <10  ){
+          const bottom = `${Math.round(Math.random()*20)}%`
+          const right = 0
+
+        const clay = $(`<img  class="clay" src="./sozai/clay.png" style="width:80px;height:50px; bottom:${bottom}; right:${right}">`)
+        $("#game").append(clay)
+        move(clay)
+        }
+
+        if(random > 10&&random <20 ){
+          const bottom = `${Math.round(Math.random()*20)}%`
+          const left = 0
+
+        const clay = $(`<img  class="clay" src="./sozai/clay.png" style="width:80px;height:50px; bottom:${bottom}; left:${left}">`)
+        $("#game").append(clay)
+        move(clay)
+        }
+
+        if(random > 15 && random <20){
+          const bottom = `${Math.round(Math.random()*20)}%`
+          const left = 0
+
+        const pigeon = $(`<img  class="pigeon" src="./sozai/pigeon1.png" style="width:80px;height:80px; bottom:${bottom}; left:${left}">`)
+        $("#game").append(pigeon)
+        move1(pigeon)
+        }
+
+        if(random > 20 && random <25 ){
+          const bottom = `${Math.round(Math.random()*20)}%`
+          const right = 0
+
+        const pigeon = $(`<img  class="pigeon" src="./sozai/pigeon1.png" style="width:80px;height:80px; bottom:${bottom}; right:${right}">`)
+        $("#game").append(pigeon)
+        move1(pigeon)
+        }
+
+        if(countdown <=0){
+          clearInterval(timer)
+          $('#game img').remove()
+          $('#btn-start').attr('disabled',false)
+          $('#FFvictory')[0].play()
+          Swal.fire({
+            icon:'info',
+            title:'Time is up.',
+            text:`You killed ${score} Pigeons.
+            And killed ${realKill} real Pigeons.`
+          })
+        }
+      },1000)
+    })
+
+    $('#game').on('click','.clay',function(){
+      $(this).attr('src','./sozai/claybreak.gif')
+      $(this).css({
+        'user-select' : 'none',
+        '-werkit-user-drag-':'none',
+        'pointer-events':'none',
+      })
+      $('#pistolSound')[0].play()
+      $(this).removeClass('clay').addClass('break')
+      score++
+      $('#score').text(score)
+      $('#clay-break')[0].play()
+    })
+
+    $('#game').on('click','.pigeon',function(){
+      $(this).attr('src','./sozai/pigeon-hit.png')
+      $(this).css({
+        'user-select' : 'none',
+        '-werkit-user-drag-':'none',
+        'pointer-events':'none',
+      })
+      $(this).removeClass('pigeon').addClass('kill')
+      score--
+      $('#score').text(score)
+      realKill++
+      $('#quack')[0].play()
+      
+      if(realKill===3){
+        clearInterval(timer)
+          $('#game img').remove()
+          $('#btn-start').attr('disabled',false)
+          $('#oh-shit')[0].play()
+          Swal.fire({
+            icon: 'error',
+            title: 'Pigeon Killer',
+            text: 'You Bloody Hell!!!You kill too many birds!!!' 
+          })
+      }
+    })
+
+  </script>
+</body>
+</html>
